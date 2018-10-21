@@ -9,7 +9,8 @@ from . import views
 urlpatterns = [
     url(r'^$', index, name='index'),
     url(r'^index/$', views.IndexView.as_view(), name='IndexView'),
-    url(r'^user/$', views.UserView.as_view(), name='UserView'),
+    url(r'^user/(?P<page>[0-9]+)/$', views.UserView.as_view(), name='user'),
+    url(r'^user/$', views.UserView.as_view(), name='user1'),
 
 ]
 

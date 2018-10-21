@@ -1,5 +1,7 @@
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse, QueryDict
 from django.views import View
+from django.contrib.auth.models import User
+from django.core.paginator import Paginator
 
 
 def index(request):
@@ -13,20 +15,60 @@ class IndexView(View):
 
 
 class UserView(View):
-    # 支持自定义方法，方法名小写
-    http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace', 'list']
 
     def get(self, request, *args, **kwargs):
-        return HttpResponse('获取用户信息')
+        per = 10
+        page = 1
+        if kwargs.get('page'):
+            page = int(kwargs.get('page'))
+        elif request.GET.get('page'):
+            page = int(request.GET.get('page'))
 
-    def delete(self, request, *args, **kwargs):
-        return HttpResponse('删除用户信息')
+        queryset = User.objects.all()
+        paginator = Paginator(queryset, per)
+        if page < paginator.page_range[0]:
+            page = paginator.page_range[0]
+        elif page > paginator.page_range[-1]:
+            page = paginator.page_range[-1]
+        paginator.page(page)
+        data = [{'id': user.id, 'username': user.username, 'email': user.email} for user in
+                paginator.page(page).object_list]
+        return JsonResponse(data, safe=False)
 
     def post(self, request, *args, **kwargs):
-        return HttpResponse('修改用户')
+        # username = request.POST.get('username')
+        # password = request.POST.get('password')
+        # email = request.POST.get('email')
+        data = request.POST.dict()
+
+        user = User.objects.create_user(**data)
+
+        return JsonResponse({'id': user.id, 'username': user.username, 'email': user.email}, safe=False)
 
     def put(self, request, *args, **kwargs):
-        return HttpResponse('添加用户')
+        data = QueryDict(request.body).dict()
 
-    def list(self, request, *args, **kwargs):
-        return HttpResponse('用户列表')
+        user = User.objects.create_user(**data)
+
+        return JsonResponse({'id': user.id, 'username': user.username, 'email': user.email}, safe=False)
+
+
+class UserViewV2(View):
+    def get(self, request, *args, **kwargs):
+        per = 10
+        page = int(kwargs.get('page'))
+        page = page if page > 0 else 1
+        queryset = User.objects.all()[(page - 1) * per:page * per]
+        data = [{'id': user.id, 'username': user.username, 'email': user.email} for user in queryset]
+        return JsonResponse(data, safe=False)
+
+
+class UserInfoView(View):
+    def post(self, request, *args, **kwargs):
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        email = request.POST.get('email')
+
+        user = User.objects.create_user(username, email, password)
+
+        return JsonResponse({'id': user.id, 'username': user.username, 'email': user.email}, safe=False)
