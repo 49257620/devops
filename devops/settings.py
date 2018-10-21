@@ -120,3 +120,72 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'loggers': {
+        'dashboard': {
+            'handlers': ["file-dashboard"],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'django.server': {
+            'handlers': ['file-server'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+        'django': {
+            'handlers': ['file-django'],
+            'level': 'DEBUG',
+            'propagate': True,
+        },
+    },
+    'handlers': {
+        'reboot': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+        },
+        'file-django': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/logs/django.log',
+            'formatter': 'json',
+        },
+        'file-dashboard': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/logs/dashboard.log',
+            'formatter': 'json',
+        },
+        'file-server': {
+            'level': 'DEBUG',
+            'class': 'logging.FileHandler',
+            'filename': '/tmp/logs/server.log',
+            'formatter': 'verbose',
+        },
+    },
+    'formatters': {
+        'reboot': {
+            'format': '%(asctime)s - %(pathname)s:%(lineno)d[%(levelname)s] - %(message)s'
+        },
+        'simple': {
+            'format': '%(asctime)s %(levelname)s %(message)s'
+        },
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'myformatter': {
+            'format': '[%(levelname)s] %(asctime)s %(name)s%(pathname)s/%(module)s/%(funcName)s() %(lineno)s - %(message)s'
+        },
+        'json': {
+            'format': '{"levelname":"%(levelname)s","asctime":"%(asctime)s","name":"%(name)s","module":"%(module)s","funcName":"%(funcName)s","lineno":"%(lineno)s","message":"%(message)s"}'
+        },
+    },
+    'root': {
+        'handlers': ['reboot'],
+        'level': 'DEBUG'
+    },
+}

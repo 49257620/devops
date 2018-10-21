@@ -2,6 +2,9 @@ from django.http import HttpResponse, JsonResponse, QueryDict
 from django.views import View
 from django.contrib.auth.models import User
 from django.core.paginator import Paginator
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def index(request):
@@ -17,6 +20,7 @@ class IndexView(View):
 class UserView(View):
 
     def get(self, request, *args, **kwargs):
+        logger.debug("用户查询")
         per = 10
         page = 1
         if kwargs.get('page'):
