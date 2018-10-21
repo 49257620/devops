@@ -1,64 +1,32 @@
-from django.shortcuts import render
-from django.http import HttpResponse, JsonResponse, QueryDict
-from django.contrib.auth import authenticate, login
-from django.contrib.auth.models import User
-import json
-from django.core.paginator import Paginator
+from django.http import HttpResponse
+from django.views import View
 
 
 def index(request):
-    print('Method:', request.method)
-    if request.method == "GET":
-        print(request.GET)
-    elif request.method == "POST":
-        print(request.POST)
-    elif request.method == 'PUT':
-        print('GET:', request.GET)
-        print('POST:', request.POST)
-        print('body:', request.body)
-        print('QueryDict:', QueryDict(request.body))
-
-    elif request.method == 'DELETE':
-        print('GET:', request.GET)
-        print('POST:', request.POST)
-        print('body:', request.body)
-        print('QueryDict:', QueryDict(request.body))
-
     return HttpResponse("")
 
 
-def loginView(request):
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-
-        user = authenticate(request, username=username, password=password)
-
-        if user:
-            login(request, user)
-            return HttpResponse("用户登陆成功!")
-        else:
-            return HttpResponse("用户登陆失败!")
-
-    return render(request, 'login.html')
+# 类视图
+class IndexView(View):
+    def get(self, request, *args, **kwargs):
+        return HttpResponse('index view!')
 
 
+class UserView(View):
+    # 支持自定义方法，方法名小写
+    http_method_names = ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace', 'list']
 
-def userList(request):
-    page = request.GET.get('page')
-    size = request.GET.get('size')
+    def get(self, request, *args, **kwargs):
+        return HttpResponse('获取用户信息')
 
-    if page and size and str.isnumeric(page) and str.isnumeric(size):
-        p, s = int(page), int(size)
-        user_data_tmp = User.objects.all()
-        paginator = Paginator(user_data_tmp, s)
-        return_data = paginator.page(p)
-    else:
-        return_data = User.objects.all()
+    def delete(self, request, *args, **kwargs):
+        return HttpResponse('删除用户信息')
 
-    user_list = []
-    for x in return_data:
-        user_dict = {'username': x.username, 'email': x.email, 'id': x.id}
-        user_list.append(user_dict)
+    def post(self, request, *args, **kwargs):
+        return HttpResponse('修改用户')
 
-    return HttpResponse(json.dumps(user_list))
+    def put(self, request, *args, **kwargs):
+        return HttpResponse('添加用户')
+
+    def list(self, request, *args, **kwargs):
+        return HttpResponse('用户列表')
