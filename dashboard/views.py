@@ -1,6 +1,9 @@
 from django.shortcuts import render
 from django.http import HttpResponse, JsonResponse, QueryDict
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
+import json
+from django.core.paginator import Paginator
 
 
 def index(request):
@@ -38,3 +41,24 @@ def loginView(request):
             return HttpResponse("用户登陆失败!")
 
     return render(request, 'login.html')
+
+
+
+def userList(request):
+    page = request.GET.get('page')
+    size = request.GET.get('size')
+
+    if page and size and str.isnumeric(page) and str.isnumeric(size):
+        p, s = int(page), int(size)
+        user_data_tmp = User.objects.all()
+        paginator = Paginator(user_data_tmp, s)
+        return_data = paginator.page(p)
+    else:
+        return_data = User.objects.all()
+
+    user_list = []
+    for x in return_data:
+        user_dict = {'username': x.username, 'email': x.email, 'id': x.id}
+        user_list.append(user_dict)
+
+    return HttpResponse(json.dumps(user_list))
