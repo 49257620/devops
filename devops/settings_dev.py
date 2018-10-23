@@ -9,10 +9,10 @@ LOGGING = {
             'handlers': ["reboot"],
             'level': 'DEBUG',
         },
-        'django': {
-            'handlers': ["reboot"],
-            'level': 'DEBUG',
-        }
+        #'django': {
+        #    'handlers': ["reboot"],
+        #    'level': 'DEBUG',
+        #}
     },
     'handlers': {
         'reboot': {

@@ -1,43 +1,13 @@
-from django.http import HttpResponse, JsonResponse, QueryDict
-from django.views import View
-from django.contrib.auth.models import User
-from django.core.paginator import Paginator
-import logging
+# 第二周作业
 
-logger = logging.getLogger(__name__)
+## 要求:
 
+是用类视图完成用户的增删改查操作
 
-def index(request):
-    return HttpResponse("")
+## 实现：
+> views代码:
 
-
-# 类视图
-class IndexView(View):
-    def get(self, request, *args, **kwargs):
-        return HttpResponse('index view!')
-
-
-class UserViewV2(View):
-    def get(self, request, *args, **kwargs):
-        per = 10
-        page = int(kwargs.get('page'))
-        page = page if page > 0 else 1
-        queryset = User.objects.all()[(page - 1) * per:page * per]
-        data = [{'id': user.id, 'username': user.username, 'email': user.email} for user in queryset]
-        return JsonResponse(data, safe=False)
-
-
-class UserInfoView(View):
-    def post(self, request, *args, **kwargs):
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-        email = request.POST.get('email')
-
-        user = User.objects.create_user(username, email, password)
-
-        return JsonResponse({'id': user.id, 'username': user.username, 'email': user.email}, safe=False)
-
-
+```
 class UserView(View):
     # 设置HTTP请求类型保留4种，增加一种LIST
     http_method_names = ['get', 'post', 'put', 'delete', 'list']
@@ -99,6 +69,46 @@ class UserView(View):
         data = [{'id': user.id, 'username': user.username, 'email': user.email} for user in
                 paginator.page(page).object_list]
         return JsonResponse(data, safe=False)
+```
 
+> 调用代码:
 
+```
+# encoding: utf-8
+# Author: LW
+import requests, json
 
+url = 'http://127.0.0.1:8000/dashboard/user/'
+
+# 添加用户
+res = requests.put(url, {'password': '123456', 'username': 'oldold', 'email': 'oldold@test.com'})
+print('[PUT]添加用户成功：', res.text)
+
+user = json.loads(res.text)
+
+# 查询用户
+res = requests.get(url, {'id': user['id']})
+print('[GET]查询用户成功：', res.text)
+
+# 修改用户
+res = requests.post(url, {'id': user['id'], 'password': '111111', 'username': 'newnew', 'email': 'newnew@test.com'})
+print('[POST]修改用户成功：', res.text)
+
+# 删除用户
+res = requests.delete(url, data={'id': user['id']})
+print('[DELETE]删除用户成功：', res.text)
+
+# 用户列表带分页
+res = requests.request('list', url, data={"page": 1000})
+print("[LIST]分页查询数据:", res.text)
+```
+
+> 调用结果:
+```
+[PUT]添加用户成功： {"id": 113, "username": "oldold", "email": "oldold@test.com"}
+[GET]查询用户成功： {"id": 113, "username": "oldold", "email": "oldold@test.com"}
+[POST]修改用户成功： {"id": 113, "username": "newnew", "email": "newnew@test.com"}
+[DELETE]删除用户成功： {"id": null, "username": "newnew", "email": "newnew@test.com"}
+[LIST]分页查询数据: [{"id": 101, "username": "oldname", "email": "oldname@test.com"}, {"id": 102, "username": "oldname1", "email": "oldname1@test.com"}, {"id": 104, "username": "oldname2", "email": "oldname2@test.com"}, {"id": 105, "username": "oldname3", "email": "oldname3@test.com"}, {"id": 106, "username": "oldname4", "email": "oldname4@test.com"}, {"id": 107, "username": "oldname5", "email": "oldname5@test.com"}]
+
+```
