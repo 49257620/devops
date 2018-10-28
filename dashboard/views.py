@@ -1,7 +1,9 @@
 from django.http import HttpResponse, JsonResponse, QueryDict
 from django.views import View
-from django.contrib.auth.models import User
+from django.shortcuts import render
+from django.contrib.auth.models import User, Group
 from django.core.paginator import Paginator
+from django.contrib.auth import authenticate, login
 import logging
 
 logger = logging.getLogger(__name__)
@@ -101,4 +103,79 @@ class UserView(View):
         return JsonResponse(data, safe=False)
 
 
+def loginView(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
 
+        user = authenticate(request, username=username, password=password)
+
+        if user:
+            login(request, user)
+            return HttpResponse("用户登陆成功!")
+        else:
+            return HttpResponse("用户登陆失败!")
+
+    return render(request, 'login.html')
+
+
+class GroupListView(View):
+    def get(self, request, *args, **kwargs):
+        group_set = Group.objects.all()
+
+        data = [{'id': group.id, 'groupname': group.name} for group in group_set]
+        return JsonResponse(data, safe=False)
+
+
+class GroupUserView(View):
+    def get(self, request, *args, **kwargs):
+        id = request.GET.get('gid')
+        group = Group.objects.get(pk=id)
+        user_set = group.user_set.all()
+        data = [{'id': user.id, 'username': user.username, "email": user.email} for user in user_set]
+        return JsonResponse(data, safe=False)
+
+
+class UserGroupView(View):
+    def get(self, request, *args, **kwargs):
+        id = request.GET.get('uid')
+        user = User.objects.get(pk=id)
+        group_set = user.groups.all()
+        data = [{'id': group.id, 'groupname': group.name} for group in group_set]
+        return JsonResponse(data, safe=False)
+
+
+class UserGroupAddView(View):
+    def post(self, request, *args, **kwargs):
+        uid = request.POST.get('uid')
+        gid = request.POST.get('gid')
+        group = Group.objects.get(pk=gid)
+        user = User.objects.get(pk=uid)
+        group.user_set.add(user)
+        data = {'uid': user.id, 'username': user.username, 'groupid': group.id, 'groupname': group.name}
+        return JsonResponse(data, safe=False)
+
+
+class UserGroupDelView(View):
+    def post(self, request, *args, **kwargs):
+        uid = request.POST.get('uid')
+        gid = request.POST.get('gid')
+        group = Group.objects.get(pk=gid)
+        user = User.objects.get(pk=uid)
+        group.user_set.remove(user)
+        data = {'uid': user.id, 'username': user.username, 'groupid': group.id, 'groupname': group.name}
+        return JsonResponse(data, safe=False)
+
+
+class GroupView(View):
+    def post(self, request, *args, **kwargs):
+        gname = request.POST.get('gname')
+        t = Group.objects.filter(name=gname)
+        print(t, len(t))
+        if len(t) == 0:
+            group = Group(name=gname)
+            group.save()
+            data = {'id': group.id, 'groupname': group.name}
+            return JsonResponse(data, safe=False)
+        else:
+            return HttpResponse("已存在")
