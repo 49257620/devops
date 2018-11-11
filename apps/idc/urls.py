@@ -81,7 +81,7 @@ urlpatterns = format_suffix_patterns(urlpatterns)
 from rest_framework import routers
 
 router = routers.DefaultRouter()
-router.register("dics", IdcViewSet_V7)
+router.register("idcs", IdcViewSet_V7)
 urlpatterns = [
     url(r'^', include(router.urls)),
 ]
