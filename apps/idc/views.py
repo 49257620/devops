@@ -1,6 +1,6 @@
 from django.http import HttpResponse, JsonResponse, QueryDict
 from idc.models import Idc
-from idc.serializer import IdcSerializer
+from idc.serializer import IdcSerializer,UserSerializer,GroupSerializer
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 
@@ -239,3 +239,49 @@ class IdcViewSet(viewsets.GenericViewSet,
 class IdcViewSet_V7(viewsets.ModelViewSet):
     queryset = Idc.objects.all()
     serializer_class = IdcSerializer
+
+
+from django.contrib.auth.models import User, Group,Permission
+from idc.serializer import IdcSerializer,UserSerializer,GroupSerializer,PermissionSerializer,UserGroupsSerializer
+
+
+class UsersViewSet(viewsets.ModelViewSet):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class GroupsViewSet(viewsets.ModelViewSet):
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+
+
+class PermissionsViewSet(viewsets.ModelViewSet):
+    queryset = Permission.objects.all()
+    serializer_class = PermissionSerializer
+
+
+class UserGroupsList(APIView):
+    def get_object(self, pk):
+        try:
+            user = User.objects.get(pk=pk)
+            return user
+        except Idc.DoesNotExist:
+            raise Http404
+
+    def get(self, pk,request, format=None):
+        # 列表
+        queryset = self.get_object(pk).groups.all()
+        list_ser = UserGroupsSerializer(queryset, many=True)
+        return Response(list_ser.data)
+
+    def post(self, request, format=None):
+        ser = IdcSerializer(data=request.data)
+
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data, status.HTTP_202_ACCEPTED)
+        return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserGroupsDetail(APIView):
+    pass

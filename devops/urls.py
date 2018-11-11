@@ -15,8 +15,19 @@ Including another URLconf
 """
 from django.conf.urls import url, include
 from django.contrib import admin
+from rest_framework.documentation import include_docs_urls
+from rest_framework import routers
+from usergroups.views import GroupsViewSet,UsersViewSet,UserGroupsViewSet
+from idc.views import IdcViewSet_V7
+router = routers.DefaultRouter()
+router.register("groups", GroupsViewSet, base_name='groups')
+router.register("users", UsersViewSet, base_name='users')
+router.register("userGroups", UserGroupsViewSet, base_name='user_group')
+router.register("idcs", IdcViewSet_V7, base_name='idcs')
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^', include('idc.urls')),
+    url(r'^docs/', include_docs_urls(title='api文档')),
+    url(r'^api/', include(router.urls)),
+
 ]

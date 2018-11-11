@@ -79,9 +79,15 @@ urlpatterns = format_suffix_patterns(urlpatterns)
 ############################## 第七版 ##################################
 
 from rest_framework import routers
+from .views import IdcViewSet, IdcViewSet_V7,UsersViewSet,GroupsViewSet,PermissionsViewSet,UserGroupsList
 
 router = routers.DefaultRouter()
 router.register("idcs", IdcViewSet_V7)
+router.register("users", UsersViewSet)
+router.register("groups", GroupsViewSet)
+router.register("permissions", PermissionsViewSet)
 urlpatterns = [
     url(r'^', include(router.urls)),
+    #url(r'^usergroups/(?P<pk>\d+)/$', UserGroupsList.as_view(), name='user_groups'),
 ]
+#urlpatterns = format_suffix_patterns(urlpatterns)

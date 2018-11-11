@@ -4,33 +4,40 @@
 
 from rest_framework import serializers
 from idc.models import Idc
-from django.contrib.auth.models import User, Group,Permission
+from django.contrib.auth.models import User, Group, Permission
 
 
-class IdcSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    name = serializers.CharField(required=False,label='IDC名称',help_text='IDC名称')
-    address = serializers.CharField(required=False,label='IDC地址',help_text='IDC地址')
-    phone = serializers.CharField(required=False,label='IDC电话',help_text='IDC电话')
-    email = serializers.EmailField(required=False,label='IDC邮件',help_text='IDC邮件')
+class UserSerializerV2(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = "__all__"
+        extra_kwargs = {
+            'password': {'write_only': True},
+        }
+
+
+class UserSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True, label='用户ID', help_text='用户ID')
+    username = serializers.CharField(required=False, label='用户名', help_text='用户名')
+    password = serializers.CharField(required=False, label='密码', help_text='密码')
+    email = serializers.EmailField(required=False, label='邮件地址', help_text='邮件地址')
 
     def create(self, validated_data):
-        return Idc.objects.create(**validated_data)
+        return User.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
-        instance.name = validated_data.get('name', instance.name)
-        instance.address = validated_data.get('address', instance.address)
-        instance.phone = validated_data.get('phone', instance.phone)
+        instance.username = validated_data.get('username', instance.username)
+        instance.password = validated_data.get('password', instance.password)
         instance.email = validated_data.get('email', instance.email)
         instance.save()
         return instance
 
 
-class UserSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    username = serializers.CharField(required=False)
-    password = serializers.CharField(required=False)
-    email = serializers.EmailField(required=False)
+class GroupUsersSerializer(serializers.Serializer):
+    id = serializers.IntegerField(required=False, label='用户ID', help_text='用户ID')
+    username = serializers.CharField(read_only=True, label='用户名', help_text='用户名')
+    # password = serializers.CharField(required=False,label='密码',help_text='密码')
+    email = serializers.EmailField(read_only=True, label='邮件地址', help_text='邮件地址')
 
     def create(self, validated_data):
         return User.objects.create(**validated_data)
