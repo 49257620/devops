@@ -14,14 +14,16 @@ from .serializer import UserSerializer, UserSerializerV2, GroupSerializer, Group
     UserGroupsSerializer
 from rest_framework import status
 from rest_framework.pagination import PageNumberPagination
+from django_filters.rest_framework import DjangoFilterBackend
+from usergroups.filters import UserFilter
 
 
 class UsersViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializerV2
-    pagination_class = PageNumberPagination
-    pagination_class.page_query_param = 'page'
-    pagination_class.page_size_query_param = 'size'
+    filter_backends = (DjangoFilterBackend,)
+    filter_class = UserFilter
+    filter_fields = ('username',)
 
 
 class GroupsViewSet(viewsets.ModelViewSet):

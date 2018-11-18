@@ -17,17 +17,22 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework.documentation import include_docs_urls
 from rest_framework import routers
-from usergroups.views import GroupsViewSet,UsersViewSet,UserGroupsViewSet
-from idc.views import IdcViewSet_V7
+from users.views import UsersViewSet
+from resources.views import ServerViewSet
 router = routers.DefaultRouter()
-router.register("groups", GroupsViewSet, base_name='groups')
 router.register("users", UsersViewSet, base_name='users')
-router.register("userGroups", UserGroupsViewSet, base_name='user_group')
-router.register("idcs", IdcViewSet_V7, base_name='idcs')
+router.register("resources", ServerViewSet, base_name='resources')
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^docs/', include_docs_urls(title='api文档')),
     url(r'^api/', include(router.urls)),
+    url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^resources/', include("resources.urls")),
 
 ]
+
+#from resources.apscheduler import scheduler
+
+
+#scheduler.start()
