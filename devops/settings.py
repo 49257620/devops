@@ -42,12 +42,14 @@ INSTALLED_APPS = [
     'users.apps.UsersConfig',
     'usergroups',
     'django_apscheduler',
+    'corsheaders',
     'django_filters',
 ]
 AUTH_USER_MODEL = 'users.User'
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -72,6 +74,9 @@ TEMPLATES = [
         },
     },
 ]
+CORS_ORIGIN_WHITELIST = (
+    '127.0.0.1:8080'
+)
 
 WSGI_APPLICATION = 'devops.wsgi.application'
 
@@ -129,14 +134,23 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 
+
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ("django_filters.rest_framework.DjangoFilterBackend",),
     'DEFAULT_PAGINATION_CLASS': 'devops.paginations.Pagination',
     'PAGE_SIZE': 10,
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated',
+        # 'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.AllowAny',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_jwt.authentication.JSONWebTokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
     ),
 }
+
+DOMAIN = '@test.com'
 
 LOGGING = {
     'version': 1,

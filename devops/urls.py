@@ -17,18 +17,29 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework.documentation import include_docs_urls
 from rest_framework import routers
-from users.views import UsersViewSet
-from resources.views import ServerViewSet
+from users.views import UsersViewSet, UserRegViewSet
+from groups.views import UserGroupViewSet,GroupViewSet,GroupMemberList,GroupMemberNoList
+from permissions.views import PermissionViewSet,GroupPermissionViewSet
+from rest_framework_jwt.views import obtain_jwt_token
+
 router = routers.DefaultRouter()
+router.register("userGroups", UserGroupViewSet, base_name='userGroups')
+router.register("groups", GroupViewSet, base_name='groups')
+router.register("groupUsers", GroupMemberList, base_name='groupUsers')
+router.register("groupNoUsers", GroupMemberNoList, base_name='groupNoUsers')
 router.register("users", UsersViewSet, base_name='users')
-router.register("resources", ServerViewSet, base_name='resources')
+router.register("userReg", UserRegViewSet, base_name='userReg')
+router.register("permission", PermissionViewSet, base_name='permission')
+router.register("groupPermission", GroupPermissionViewSet, base_name='groupPermission')
+
+
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^docs/', include_docs_urls(title='api文档')),
     url(r'^api/', include(router.urls)),
     url(r'^api-auth/', include('rest_framework.urls', namespace='rest_framework')),
-    url(r'^resources/', include("resources.urls")),
+    url(r'^api-token-auth/', obtain_jwt_token),
 
 ]
 

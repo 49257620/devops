@@ -3,8 +3,10 @@
 # author = ‘LW’
 
 from rest_framework import serializers
-from idc.models import Idc
 from django.contrib.auth.models import User, Group, Permission
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 
 class UserSerializerV2(serializers.ModelSerializer):
@@ -33,7 +35,7 @@ class UserSerializer(serializers.Serializer):
         return instance
 
 
-class GroupUsersSerializer(serializers.Serializer):
+class GroupUsersSerializer2(serializers.Serializer):
     id = serializers.IntegerField(required=False, label='用户ID', help_text='用户ID')
     username = serializers.CharField(read_only=True, label='用户名', help_text='用户名')
     # password = serializers.CharField(required=False,label='密码',help_text='密码')
@@ -80,7 +82,7 @@ class PermissionSerializer(serializers.Serializer):
         return instance
 
 
-class UserGroupsSerializer(serializers.Serializer):
+class UserGroupsSerializer1(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     user_id = serializers.CharField(required=False)
     group_id = serializers.CharField(required=False)
@@ -93,3 +95,14 @@ class UserGroupsSerializer(serializers.Serializer):
         instance.group_id = validated_data.get('group_id', instance.group_id)
         instance.save()
         return instance
+
+
+class UserGroupsSerializer(serializers.Serializer):
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(required=False)
+
+    def create(self, validated_data):
+        pass
+
+    def update(self, instance, validated_data):
+        pass
