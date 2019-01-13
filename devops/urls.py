@@ -19,10 +19,12 @@ from rest_framework.documentation import include_docs_urls
 from rest_framework import routers
 
 from books.views import PublishViewSet, AuthorViewSet, BookViewSet
-from users.views import UsersViewSet, UserRegViewSet
+from users.views import UsersViewSet, UserRegViewSet,UserInfoViewset
 from groups.views import UserGroupViewSet,GroupViewSet,GroupMemberList,GroupMemberNoList
 from permissions.views import PermissionViewSet,GroupPermissionViewSet
 from rest_framework_jwt.views import obtain_jwt_token
+
+from workorder.views import WorkOrderViewSet
 
 router = routers.DefaultRouter()
 router.register("userGroups", UserGroupViewSet, base_name='userGroups')
@@ -36,6 +38,8 @@ router.register("groupPermission", GroupPermissionViewSet, base_name='groupPermi
 router.register("publish", PublishViewSet, base_name='publish')
 router.register("author", AuthorViewSet, base_name='author')
 router.register("book", BookViewSet, base_name='book')
+router.register("UserInfo", UserInfoViewset, basename="UserInfo")
+router.register("workorder", WorkOrderViewSet, basename="workorder")
 
 
 urlpatterns = [

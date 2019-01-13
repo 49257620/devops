@@ -1,6 +1,6 @@
 
 # Create your views here.
-from rest_framework import viewsets,mixins
+from rest_framework import viewsets,mixins,permissions,response
 from .serializer import UserSerializer,UserRegSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from usergroups.filters import UserFilter
@@ -28,3 +28,15 @@ class UserRegViewSet(viewsets.GenericViewSet,
                      mixins.UpdateModelMixin):
     queryset = User.objects.all()
     serializer_class = UserRegSerializer
+
+
+class UserInfoViewset(viewsets.ViewSet):
+    permission_classes = (permissions.IsAuthenticated,)
+    def list(self, request, *args, **kwargs):
+        data = {
+            "username": self.request.user.username,
+            "name": self.request.user.name,
+            "permission": self.request.user.get_all_permissions(),
+            "roles": [x.name for x in self.request.user.groups.all()]
+        }
+        return response.Response(data)

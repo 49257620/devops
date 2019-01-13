@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_apscheduler',
     'corsheaders',
     'books',
+    'workorder',
     'django_filters',
 ]
 AUTH_USER_MODEL = 'users.User'
