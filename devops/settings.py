@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'usergroups',
     'django_apscheduler',
     'corsheaders',
+    'books',
     'django_filters',
 ]
 AUTH_USER_MODEL = 'users.User'

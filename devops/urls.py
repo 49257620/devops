@@ -17,6 +17,8 @@ from django.conf.urls import url, include
 from django.contrib import admin
 from rest_framework.documentation import include_docs_urls
 from rest_framework import routers
+
+from books.views import PublishViewSet, AuthorViewSet, BookViewSet
 from users.views import UsersViewSet, UserRegViewSet
 from groups.views import UserGroupViewSet,GroupViewSet,GroupMemberList,GroupMemberNoList
 from permissions.views import PermissionViewSet,GroupPermissionViewSet
@@ -31,7 +33,9 @@ router.register("users", UsersViewSet, base_name='users')
 router.register("userReg", UserRegViewSet, base_name='userReg')
 router.register("permission", PermissionViewSet, base_name='permission')
 router.register("groupPermission", GroupPermissionViewSet, base_name='groupPermission')
-
+router.register("publish", PublishViewSet, base_name='publish')
+router.register("author", AuthorViewSet, base_name='author')
+router.register("book", BookViewSet, base_name='book')
 
 
 urlpatterns = [
